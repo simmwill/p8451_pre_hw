@@ -1,0 +1,211 @@
+---
+title: "P8451 HW0"
+author: "Will Simmons"
+date: "1/17/2020"
+output: github_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup}
+
+library(tidyverse)
+library(readr)
+
+```
+
+0. Importing data
+```{r import}
+
+data = 
+  read_csv('./data/dataR2.csv')
+
+```
+
+1. Construct a table providing summaries of the quantitative features of the dataset. Summaries should include the mean, median, minimum value, and maximum value. If you are unable to construct a formatted table within R, you can print raw output, but then comment the output to identify the answer that was requested.
+
+```{r 1_table}
+
+data %>%
+  summarize_all(
+    list(
+      Mean = mean,
+      Median = median,
+      Minimum = min,
+      Maximum = max)
+  ) %>% 
+  gather(stat, val) %>% 
+  separate(stat, into = c("Variable", "stat"), sep = "_") %>% 
+  spread(stat, val) %>% 
+  select(Variable, Mean, Median, Minimum, Maximum) %>% 
+  knitr::kable(
+    caption = "Summary of dataset variables"
+  )
+
+```
+
+2. Recode BMI into the WHO-defined categories below:
+  + Severely underweight - BMI less than 16.5kg/m^2 
+  + Underweight - BMI under 18.5 kg/m^2 
+  + Normal weight - BMI greater than or equal to 18.5 to 24.9 kg/m^2 
+  + Overweight – BMI greater than or equal to 25 to 29.9 kg/m^2 
+  + Obesity class I – BMI 30 to 34.9 kg/m^2 
+  + Obesity class II – BMI 35 to 39.9 kg/m^2 
+  + Obesity class III – BMI greater than or equal to 40 kg/m^2
+  
+```{r 2_recode_bmi}
+
+data =
+  data %>% 
+  mutate(
+    BMI_new = 
+      case_when(
+        BMI < 16.5 ~ 'Severely Underweight',
+        between(BMI, 16.5, 18.4) ~ 'Underweight',
+        between(BMI, 18.5, 24.9) ~ 'Normal Weight',
+        between(BMI, 25, 29.9) ~ 'Overweight',
+        between(BMI, 30, 34.9) ~ 'Obesity Class I',
+        between(BMI, 35, 39.9) ~ 'Obesity Class II',
+        BMI >= 40 ~ 'Obesity Class III'
+      )
+  )
+
+```
+  
+3. Create a bar chart showing the proportion of breast cancer cases and controls within each BMI category
+
+```{r 3_bar}
+
+data %>% 
+  mutate(
+    Classification = as.factor(Classification),
+    BMI_new = fct_reorder(BMI_new, BMI)
+  ) %>% 
+  group_by(BMI_new, Classification) %>% 
+  summarize(count = n()) %>% 
+  mutate(percent = count/sum(count)) %>% 
+  
+  ggplot(
+    aes(
+      fill = Classification,
+      x = BMI_new,
+      y = percent
+    )
+  ) +
+  geom_bar(
+    position = 'stack', 
+    stat = 'identity'
+  ) +
+  labs(
+    y = 'Proportion\n',
+    x = 'BMI Category',
+    title = 'Proportion of cases and controls by BMI category'
+  ) +
+  theme(
+    legend.position = 'bottom',
+    plot.title = element_text(hjust = 0.5),
+    legend.title = element_blank(),
+    
+  ) +
+  scale_fill_discrete(
+    labels = c('Healthy controls', 'Breast cancer patients')
+  )
+
+```
+
+4. Construct a logistic regression model using breast cancer classification as the outcome and glucose, HOMA, leptin, BMI (continuous) and age as the independent variables. 
+  + Fill in the beta estimate and 95% confidence interval associated with a 1-unit change in HOMA
+
+```{r 4_logistic}
+
+logistic_model =
+  data %>% 
+  mutate(
+    Classification = as.factor(Classification),
+    Classification = fct_recode(
+      Classification,
+      '0' = '1',
+      '1' = '2'
+    )
+  ) %>% 
+  glm(
+    Classification ~ Glucose + HOMA + Leptin + BMI + Age,
+    data = .,
+    family = binomial
+  ) 
+
+logistic_model_tidy =
+  logistic_model %>% 
+  broom::tidy()
+
+ci_betas =
+  as.data.frame(
+    confint.default(logistic_model)
+  ) %>% 
+  add_column(
+    Variable = c(
+      '(Intercept)',
+      'Glucose',     
+      'HOMA',  
+      'Leptin',      
+      'BMI',         
+      'Age')
+  )
+
+final_table_logistic = 
+  inner_join(
+    logistic_model_tidy,
+    ci_betas,
+    by = c('term' = 'Variable')
+  ) %>% 
+  select(term, estimate, '2.5 %', '97.5 %', everything())
+
+final_table_logistic %>% 
+  knitr::kable()
+
+```
+
+The beta estimate for a 1-unit change in HOMA is `r final_table_logistic$estimate[3]`. The associated 95% CI is (`r final_table_logistic$'2.5 %'[3]`, `r final_table_logistic$'97.5 %'[3]`).
+
+5.	Construct a linear regression model using insulin as the outcome and BMI (continuous), age, and glucose as the independent variables. 
+  + Fill in the beta estimate and 95% confidence interval associated with a 1-unit change in age.
+  
+```{r 5_linear}
+
+linear_model =
+  data %>% 
+  lm(
+    Insulin ~ BMI + Age + Glucose,
+    data = .
+  ) 
+
+linear_model_tidy =
+  linear_model %>% 
+  broom::tidy()
+
+ci_betas_linear =
+  as.data.frame(
+    confint.default(linear_model)
+  ) %>% 
+  add_column(
+    Variable = c(
+      '(Intercept)',
+      'BMI',     
+      'Age',  
+      'Glucose')
+  )
+
+final_table_linear = 
+  inner_join(
+    linear_model_tidy,
+    ci_betas_linear,
+    by = c('term' = 'Variable')
+  ) %>% 
+  select(term, estimate, '2.5 %', '97.5 %', everything())
+
+final_table_linear %>% 
+  knitr::kable()
+
+```
+
+The beta estimate for a 1-unit change in age is `r final_table_linear$estimate[3]`. The associated 95% CI is (`r final_table_linear$'2.5 %'[3]`, `r final_table_linear$'97.5 %'[3]`).
