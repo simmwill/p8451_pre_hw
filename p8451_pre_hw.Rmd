@@ -14,7 +14,8 @@ library(readr)
 
 ```
 
-0. Importing data
+### Problem 0
+Importing data
 ```{r import}
 
 data = 
@@ -22,7 +23,8 @@ data =
 
 ```
 
-1. Construct a table providing summaries of the quantitative features of the dataset. Summaries should include the mean, median, minimum value, and maximum value. If you are unable to construct a formatted table within R, you can print raw output, but then comment the output to identify the answer that was requested.
+### Problem 1
+Construct a table providing summaries of the quantitative features of the dataset. Summaries should include the mean, median, minimum value, and maximum value. If you are unable to construct a formatted table within R, you can print raw output, but then comment the output to identify the answer that was requested.
 
 ```{r 1_table}
 
@@ -38,20 +40,20 @@ data %>%
   separate(stat, into = c("Variable", "stat"), sep = "_") %>% 
   spread(stat, val) %>% 
   select(Variable, Mean, Median, Minimum, Maximum) %>% 
-  knitr::kable(
-    caption = "Summary of dataset variables"
-  )
+  knitr::kable()
 
 ```
 
-2. Recode BMI into the WHO-defined categories below:
-  + Severely underweight - BMI less than 16.5kg/m^2 
-  + Underweight - BMI under 18.5 kg/m^2 
-  + Normal weight - BMI greater than or equal to 18.5 to 24.9 kg/m^2 
-  + Overweight – BMI greater than or equal to 25 to 29.9 kg/m^2 
-  + Obesity class I – BMI 30 to 34.9 kg/m^2 
-  + Obesity class II – BMI 35 to 39.9 kg/m^2 
-  + Obesity class III – BMI greater than or equal to 40 kg/m^2
+### Problem 2
+Recode BMI into the WHO-defined categories below:
+
+  * Severely underweight - BMI less than 16.5kg/m^2 
+  * Underweight - BMI under 18.5 kg/m^2 
+  * Normal weight - BMI greater than or equal to 18.5 to 24.9 kg/m^2 
+  * Overweight – BMI greater than or equal to 25 to 29.9 kg/m^2 
+  * Obesity class I – BMI 30 to 34.9 kg/m^2 
+  * Obesity class II – BMI 35 to 39.9 kg/m^2 
+  * Obesity class III – BMI greater than or equal to 40 kg/m^2
   
 ```{r 2_recode_bmi}
 
@@ -72,7 +74,8 @@ data =
 
 ```
   
-3. Create a bar chart showing the proportion of breast cancer cases and controls within each BMI category
+### Problem 3
+Create a bar chart showing the proportion of breast cancer cases and controls within each BMI category
 
 ```{r 3_bar}
 
@@ -113,8 +116,10 @@ data %>%
 
 ```
 
-4. Construct a logistic regression model using breast cancer classification as the outcome and glucose, HOMA, leptin, BMI (continuous) and age as the independent variables. 
-  + Fill in the beta estimate and 95% confidence interval associated with a 1-unit change in HOMA
+### Problem 4
+Construct a logistic regression model using breast cancer classification as the outcome and glucose, HOMA, leptin, BMI (continuous) and age as the independent variables. 
+
+  * Fill in the beta estimate and 95% confidence interval associated with a 1-unit change in HOMA
 
 ```{r 4_logistic}
 
@@ -167,8 +172,10 @@ final_table_logistic %>%
 
 The beta estimate for a 1-unit change in HOMA is `r final_table_logistic$estimate[3]`. The associated 95% CI is (`r final_table_logistic$'2.5 %'[3]`, `r final_table_logistic$'97.5 %'[3]`).
 
-5.	Construct a linear regression model using insulin as the outcome and BMI (continuous), age, and glucose as the independent variables. 
-  + Fill in the beta estimate and 95% confidence interval associated with a 1-unit change in age.
+### Problem 5
+Construct a linear regression model using insulin as the outcome and BMI (continuous), age, and glucose as the independent variables. 
+
+  * Fill in the beta estimate and 95% confidence interval associated with a 1-unit change in age.
   
 ```{r 5_linear}
 

@@ -22,9 +22,9 @@ library(tidyverse)
 library(readr)
 ```
 
-0.  Importing data
+### Problem 0
 
-<!-- end list -->
+Importing data
 
 ``` r
 data = 
@@ -45,13 +45,13 @@ data =
     ##   Classification = col_double()
     ## )
 
-1.  Construct a table providing summaries of the quantitative features
-    of the dataset. Summaries should include the mean, median, minimum
-    value, and maximum value. If you are unable to construct a formatted
-    table within R, you can print raw output, but then comment the
-    output to identify the answer that was requested.
+### Problem 1
 
-<!-- end list -->
+Construct a table providing summaries of the quantitative features of
+the dataset. Summaries should include the mean, median, minimum value,
+and maximum value. If you are unable to construct a formatted table
+within R, you can print raw output, but then comment the output to
+identify the answer that was requested.
 
 ``` r
 data %>%
@@ -66,9 +66,7 @@ data %>%
   separate(stat, into = c("Variable", "stat"), sep = "_") %>% 
   spread(stat, val) %>% 
   select(Variable, Mean, Median, Minimum, Maximum) %>% 
-  knitr::kable(
-    caption = "Summary of dataset variables"
-  )
+  knitr::kable()
 ```
 
 | Variable       |       Mean |     Median |    Minimum |    Maximum |
@@ -84,11 +82,9 @@ data %>%
 | MCP.1          | 534.647000 | 471.322500 | 45.8430000 | 1698.44000 |
 | Resistin       |  14.725966 |  10.827740 |  3.2100000 |   82.10000 |
 
-Summary of dataset variables
+### Problem 2
 
-2.  Recode BMI into the WHO-defined categories below:
-
-<!-- end list -->
+Recode BMI into the WHO-defined categories below:
 
   - Severely underweight - BMI less than 16.5kg/m^2
   - Underweight - BMI under 18.5 kg/m^2
@@ -117,10 +113,10 @@ data =
   )
 ```
 
-3.  Create a bar chart showing the proportion of breast cancer cases and
-    controls within each BMI category
+### Problem 3
 
-<!-- end list -->
+Create a bar chart showing the proportion of breast cancer cases and
+controls within each BMI category
 
 ``` r
 data %>% 
@@ -161,11 +157,11 @@ data %>%
 
 ![](p8451_pre_hw_files/figure-gfm/3_bar-1.png)<!-- -->
 
-4.  Construct a logistic regression model using breast cancer
-    classification as the outcome and glucose, HOMA, leptin, BMI
-    (continuous) and age as the independent variables.
+### Problem 4
 
-<!-- end list -->
+Construct a logistic regression model using breast cancer classification
+as the outcome and glucose, HOMA, leptin, BMI (continuous) and age as
+the independent variables.
 
   - Fill in the beta estimate and 95% confidence interval associated
     with a 1-unit change in HOMA
@@ -231,10 +227,10 @@ final_table_logistic %>%
 The beta estimate for a 1-unit change in HOMA is 0.2738822. The
 associated 95% CI is (-0.0631845, 0.6109489).
 
-5.  Construct a linear regression model using insulin as the outcome and
-    BMI (continuous), age, and glucose as the independent variables.
+### Problem 5
 
-<!-- end list -->
+Construct a linear regression model using insulin as the outcome and BMI
+(continuous), age, and glucose as the independent variables.
 
   - Fill in the beta estimate and 95% confidence interval associated
     with a 1-unit change in age.
